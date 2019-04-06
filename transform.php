@@ -1,5 +1,6 @@
 <?php
 session_start();
+$id = $_SESSION['user_id'];
 
 define('DB_SERVER', 'localhost:3306');
 define('DB_USERNAME', 'root');
@@ -103,85 +104,13 @@ if (isset($_POST['reg_user'])) {
 
     <!-- Login Form -->
     <form action="" method="POST">
-    
-
-      <input type="text" id="username" class="fadeIn second" name="username" placeholder="Login">
-      <!--<input type="password" class="fadeIn third" name="password" placeholder="password"> -->
+      <select name="tr_type" class="btn dropdown-toggle selectclass">
+        <option value="Deposit">Deposit</option>
+        <option value="Withdraw">Withdraw</option>
+      </select>
+      <input type="number" id="username" class="fadeIn second" name="tr_amount" placeholder="Login">
       <input type="text" class="fadeIn third" name="login" id="login" placeholder="password">
-      <input type="email" class="fadeIn third" name="email" id="login" placeholder="email">
-      <input type="text" class="fadeIn third" name="fname" id="login" placeholder="First Name">
-      <input type="text" class="fadeIn third" name="lname" id="login" placeholder="Last Name">
-      <input type="text" class="fadeIn third" name="ssn" id="login" placeholder="SSN">
-      <select name="branch_id" class="btn dropdown-toggle selectclass">
-        <option value="3">Livonia</option>
-        <option value="5">Northville</option>
-        <option value="4">Canton</option>
-      </select>
-      <select name="age" class="btn dropdown-toggle selectclass">
-      <?php
-        for ($i=1; $i<=100; $i++)
-        {
-      ?>
-        <option value="<?php echo $i;?>"><?php echo $i;?></option>
-      <?php
-        }
-      ?>
-      </select>
-      <input type="text" class="fadeIn third" name="street" id="login" placeholder="Street">
-      <input type="text" class="fadeIn third" name="city" id="login" placeholder="city">
-      <select name="state" class="btn dropdown-toggle selectclass">
-        <option value="AL">AL</option>
-	      <option value="AK">AK</option>
-	      <option value="AR">AR</option>	
-	      <option value="AZ">AZ</option>
-	      <option value="CA">CA</option>
-	      <option value="CO">CO</option>
-	      <option value="CT">CT</option>
-	      <option value="DC">DC</option>
-	      <option value="DE">DE</option>
-	      <option value="FL">FL</option>
-	      <option value="GA">GA</option>
-	      <option value="HI">HI</option>
-	      <option value="IA">IA</option>	
-	      <option value="ID">ID</option>
-	      <option value="IL">IL</option>
-	      <option value="IN">IN</option>
-	      <option value="KS">KS</option>
-	      <option value="KY">KY</option>
-	      <option value="LA">LA</option>
-	      <option value="MA">MA</option>
-	      <option value="MD">MD</option>
-	      <option value="ME">ME</option>
-	      <option value="MI">MI</option>
-	      <option value="MN">MN</option>
-	      <option value="MO">MO</option>	
-	      <option value="MS">MS</option>
-	      <option value="MT">MT</option>
-	      <option value="NC">NC</option>	
-	      <option value="NE">NE</option>
-	      <option value="NH">NH</option>
-	      <option value="NJ">NJ</option>
-	      <option value="NM">NM</option>			
-	      <option value="NV">NV</option>
-	      <option value="NY">NY</option>
-	      <option value="ND">ND</option>
-	      <option value="OH">OH</option>
-	      <option value="OK">OK</option>
-	      <option value="OR">OR</option>
-	      <option value="PA">PA</option>
-	      <option value="RI">RI</option>
-	      <option value="SC">SC</option>
-	      <option value="SD">SD</option>
-	      <option value="TN">TN</option>
-	      <option value="TX">TX</option>
-	      <option value="UT">UT</option>
-	      <option value="VT">VT</option>
-	      <option value="VA">VA</option>
-	      <option value="WA">WA</option>
-      	<option value="WI">WI</option>	
-	      <option value="WV">WV</option>
-	      <option value="WY">WY</option>
-    </select>	
+      
 
       
       
