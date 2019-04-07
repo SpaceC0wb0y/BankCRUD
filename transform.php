@@ -108,8 +108,8 @@ if (isset($_POST['reg_user'])) {
         <option value="Deposit">Deposit</option>
         <option value="Withdraw">Withdraw</option>
       </select>
-      <input type="number" id="username" class="fadeIn second" name="tr_amount" placeholder="Login">
-      <input type="text" class="fadeIn third" name="login" id="login" placeholder="password">
+      <input type="number" id="username" min="0" class="fadeIn second" name="tr_amount" placeholder="Login">
+      <input type="text" class="fadeIn third" name="tr_acc_no" id="login" placeholder="password">
       
 
       

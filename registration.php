@@ -1,6 +1,11 @@
 <?php
-include 'db_connection.php';
+//include 'db_connection.php';
 session_start();
+define('DB_SERVER', 'localhost:3306');
+define('DB_USERNAME', 'root');
+define('DB_PASSWORD', '');
+define('DB_DATABASE', 'P1');
+$db = mysqli_connect(DB_SERVER,DB_USERNAME,DB_PASSWORD,DB_DATABASE);
 
 $username = "";
 $email    = "";
@@ -20,6 +25,7 @@ if (isset($_POST['reg_user'])) {
     $city = mysqli_real_escape_string($db, $_POST['city']);
     $state = mysqli_real_escape_string($db, $_POST['state']);
     $ssn = mysqli_real_escape_string($db, $_POST['ssn']);
+    $acc_type = mysqli_real_escape_string($db, $_POST['acc_type']);
 
    
   
@@ -32,7 +38,7 @@ if (isset($_POST['reg_user'])) {
   
     // first check the database to make sure 
     // a user does not already exist with the same username and/or email
-    $user_check_query = "SELECT * FROM CIS421.customer WHERE user='$username' LIMIT 1";
+    $user_check_query = "SELECT * FROM customer WHERE user='$username' LIMIT 1";
     $result = mysqli_query($db, $user_check_query);
     $user = mysqli_fetch_assoc($result);
     
@@ -48,23 +54,32 @@ if (isset($_POST['reg_user'])) {
     
   
     // Finally, register user if there are no errors in the form
+    
     if (count($errors) == 0) {
         
-        $query = "INSERT INTO CIS421.customer (ssn,user,pass,branch_id,firstname,lastname,age,street,city,state_1) VALUES ('$ssn','$username','$password_1','$branch_id','$firstname','$lastname','$age','$street','$city','$state')";
+        $query = "INSERT INTO customer (ssn,user,pass,branch_id,firstname,lastname,age,street,city,state_1) VALUES ('$ssn','$username','$password_1','$branch_id','$firstname','$lastname','$age','$street','$city','$state')";
         
         mysqli_query($db, $query);
-        //$query = "SELECT * FROM CIS421.customer WHERE user='$username'";
-        //$test= mysqli_fetch_assoc($result);
+        $query = "SELECT * FROM customer WHERE user='$username'";
+        $result = mysqli_query($db, $query);
+        $test = mysqli_fetch_assoc($result);
+        $user_id = $test['id'];
+        echo $user_id;
+        $balance = 0;
+        $query2 = "INSERT INTO account (cust_id,acc_type,balance) VALUES ('$user_id','$acc_type','$balance')";
+        mysqli_query($db, $query2);
         //echo $test['user'];
-        //echo "WE HERE";
+        echo "WE HERE";
         $_SESSION['username'] = $username;
         $_SESSION['success'] = "You are now logged in";
         //echo "DONE!!!";
-        header('location: index.php');
+        //header('location: index.php');
 
         
     }
   }
+
+  
 ?>
 
 
@@ -122,6 +137,10 @@ if (isset($_POST['reg_user'])) {
         }
       ?>
       </select>
+      <select name="acc_type" class="btn dropdown-toggle selectclass">
+        <option value="Checking">Checking</option>
+        <option value="Savings">Savings</option>
+      </select> 
       <input type="text" class="fadeIn third" name="street" id="login" placeholder="Street">
       <input type="text" class="fadeIn third" name="city" id="login" placeholder="city">
       <select name="state" class="btn dropdown-toggle selectclass">
