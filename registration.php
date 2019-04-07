@@ -7,6 +7,7 @@ define('DB_PASSWORD', '');
 define('DB_DATABASE', 'P1');
 $db = mysqli_connect(DB_SERVER,DB_USERNAME,DB_PASSWORD,DB_DATABASE);
 
+
 $username = "";
 $email    = "";
 $errors = array();
@@ -38,43 +39,46 @@ if (isset($_POST['reg_user'])) {
   
     // first check the database to make sure 
     // a user does not already exist with the same username and/or email
-    $user_check_query = "SELECT * FROM customer WHERE user='$username' LIMIT 1";
+    $user_check_query = "SELECT * FROM P1.customer WHERE user='$username' LIMIT 1";
     $result = mysqli_query($db, $user_check_query);
     $user = mysqli_fetch_assoc($result);
     
+    
     if ($user) { // if user exists
+      
       if ($user['user'] === $username) {
         array_push($errors, "Username already exists");
         
+        
       }
-  
+      
       
     }
-
+    
     
   
     // Finally, register user if there are no errors in the form
     
     if (count($errors) == 0) {
         
-        $query = "INSERT INTO customer (ssn,user,pass,branch_id,firstname,lastname,age,street,city,state_1) VALUES ('$ssn','$username','$password_1','$branch_id','$firstname','$lastname','$age','$street','$city','$state')";
+        $query = "INSERT INTO P1.customer (branch_id,ssn,user,pass,firstname,lastname,age,street,city,state) VALUES ('$branch_id','$ssn','$username','$password_1','$firstname','$lastname','$age','$street','$city','$state')";
         
         mysqli_query($db, $query);
-        $query = "SELECT * FROM customer WHERE user='$username'";
+        $query = "SELECT * FROM P1.customer WHERE user='$username'";
         $result = mysqli_query($db, $query);
         $test = mysqli_fetch_assoc($result);
         $user_id = $test['id'];
-        echo $user_id;
+        
         $balance = 0;
-        $query2 = "INSERT INTO account (cust_id,acc_type,balance) VALUES ('$user_id','$acc_type','$balance')";
+        $query2 = "INSERT INTO P1.account (cust_id,acc_type,balance) VALUES ('$user_id','$acc_type','$balance')";
         mysqli_query($db, $query2);
         //echo $test['user'];
-        echo "WE HERE";
+        
         $_SESSION['username'] = $username;
         $_SESSION['success'] = "You are now logged in";
         //echo "DONE!!!";
-        //header('location: index.php');
-
+        header('location: login.php');
+        
         
     }
   }

@@ -5,66 +5,80 @@ $id = $_SESSION['user_id'];
 define('DB_SERVER', 'localhost:3306');
 define('DB_USERNAME', 'root');
 define('DB_PASSWORD', '');
-define('DB_DATABASE', 'CIS421');
+define('DB_DATABASE', 'P1');
 $db = mysqli_connect(DB_SERVER,DB_USERNAME,DB_PASSWORD,DB_DATABASE);
-
-$username = "";
-$email    = "";
+//echo $id;
 $errors = array();
+
+$userget = "SELECT user FROM P1.customer WHERE id = '$id'";
+$userrun = mysqli_query($db, $userget);
+$userfetch = mysqli_fetch_assoc($userrun);
+$user = $userfetch['user'];
+//echo $user;
+$accget = mysqli_query($db,"SELECT acc_no FROM P1.account WHERE cust_id in (SELECT id FROM P1.customer WHERE user = '$user')");
+    
+    
+    
 
 // REGISTER USER
 if (isset($_POST['reg_user'])) {
     // receive all input values from the form
-    $username = mysqli_real_escape_string($db, $_POST['username']);
-    $email = mysqli_real_escape_string($db, $_POST['email']);
-    $password_1 = mysqli_real_escape_string($db, $_POST['login']);
-    $branch_id = mysqli_real_escape_string($db, $_POST['branch_id']);
-    $firstname = mysqli_real_escape_string($db, $_POST['fname']);
-    $lastname = mysqli_real_escape_string($db, $_POST['lname']);
-    $age = mysqli_real_escape_string($db, $_POST['age']);
-    $street = mysqli_real_escape_string($db, $_POST['street']);
-    $city = mysqli_real_escape_string($db, $_POST['city']);
-    $state = mysqli_real_escape_string($db, $_POST['state']);
-    $ssn = mysqli_real_escape_string($db, $_POST['ssn']);
+    $tr_type = mysqli_real_escape_string($db, $_POST['tr_type']);
+    $tr_amount = mysqli_real_escape_string($db, $_POST['tr_amount']);
+    $tr_acc_no = mysqli_real_escape_string($db, $_POST['tr_acc_no']);
+    
 
-   
-  
+    
     // form validation: ensure that the form is correctly filled ...
     // by adding (array_push()) corresponding error unto $errors array
-    if (empty($username)) { array_push($errors, "Username is required"); }
-    if (empty($email)) { array_push($errors, "Email is required"); }
-    if (empty($password_1)) { array_push($errors, "Password is required"); }
+    if (empty($tr_type)) { array_push($errors, "Username is required"); }
+    if (empty($tr_amount)) { array_push($errors, "Email is required"); }
+    if (empty($tr_acc_no)) { array_push($errors, "Password is required"); }
     
-  
-    // first check the database to make sure 
-    // a user does not already exist with the same username and/or email
-    $user_check_query = "SELECT * FROM CIS421.customer WHERE user='$username' LIMIT 1";
-    $result = mysqli_query($db, $user_check_query);
-    $user = mysqli_fetch_assoc($result);
     
-    if ($user) { // if user exists
-      if ($user['user'] === $username) {
-        array_push($errors, "Username already exists");
-        
-      }
-  
-      
-    }
+    
+     
+    
 
     
   
     // Finally, register user if there are no errors in the form
     if (count($errors) == 0) {
         
-        $query = "INSERT INTO CIS421.customer (ssn,user,pass,branch_id,firstname,lastname,age,street,city,state_1) VALUES ('$ssn','$username','$password_1','$branch_id','$firstname','$lastname','$age','$street','$city','$state')";
+        if ($tr_type == "Deposit") {
+            echo $tr_type;
+            echo $tr_amount;
+            echo $tr_acc_no;
+            mysqli_query($db,"INSERT INTO P1.transaction (cust_id,tr_type,tr_amount,tr_acc_no) VALUES ('$id','$tr_type','$tr_amount','$tr_acc_no')");
+            mysqli_query($db,"UPDATE account SET balance = balance + $tr_amount where acc_no = $tr_acc_no");
+        }
+
+        if ($tr_type == "Withdraw") {
+            //echo $tr_type;
+            //echo $tr_amount;
+            //echo $tr_acc_no;
+            //mysqli_query($db,"INSERT INTO P1.transaction (cust_id,tr_type,tr_amount,tr_acc_no) VALUES ('$id','$tr_type','$tr_amount','$tr_acc_no')");
+            $balanceget = mysqli_query($db,"SELECT balance FROM account WHERE acc_no = $tr_acc_no");
+            $balancefetch = mysqli_fetch_array($balanceget);
+            $balance = $balancefetch['balance'];
+            echo $balance;
+            if($balance > $tr_amount){
+                mysqli_query($db,"UPDATE account SET balance = balance - $tr_amount where acc_no = $tr_acc_no");
+            }
+            else{
+                echo '<h2 class= "text-center text-danger" >Not enough money in the account</h2>';
+            }
+            //mysqli_query($db,"UPDATE account SET balance = balance - $tr_amount where acc_no = $tr_acc_no");
+        }
         
-        mysqli_query($db, $query);
+        //$query = "INSERT INTO CIS421.customer (ssn,user,pass,branch_id,firstname,lastname,age,street,city,state_1) VALUES ('$ssn','$username','$password_1','$branch_id','$firstname','$lastname','$age','$street','$city','$state')";
+        
+        //mysqli_query($db, $query);
         //$query = "SELECT * FROM CIS421.customer WHERE user='$username'";
         //$test= mysqli_fetch_assoc($result);
         //echo $test['user'];
         //echo "WE HERE";
-        $_SESSION['username'] = $username;
-        $_SESSION['success'] = "You are now logged in";
+        
         //echo "DONE!!!";
         header('location: index.php');
 
@@ -94,7 +108,7 @@ if (isset($_POST['reg_user'])) {
 <body>
 <div class="wrapper fadeInDown">
   <div id="formContent">
-    <!-- Tabs Titles -->
+    
 
     <!-- Icon -->
     <div class="fadeIn first">
@@ -102,14 +116,23 @@ if (isset($_POST['reg_user'])) {
     <span>Register</span>
     </div>
 
-    <!-- Login Form -->
+    <!-- Transaction Form -->
     <form action="" method="POST">
       <select name="tr_type" class="btn dropdown-toggle selectclass">
         <option value="Deposit">Deposit</option>
         <option value="Withdraw">Withdraw</option>
       </select>
-      <input type="number" id="username" min="0" class="fadeIn second" name="tr_amount" placeholder="Login">
-      <input type="text" class="fadeIn third" name="tr_acc_no" id="login" placeholder="password">
+      <input type="number" id="username" min="0" class="fadeIn second" name="tr_amount" placeholder="Amount">
+      
+      <select name="tr_acc_no" class="btn dropdown-toggle selectclass">
+        <?php
+        while($accfetch = mysqli_fetch_array($accget)) {
+            
+            echo "<option value =" .$accfetch['acc_no'].">".$accfetch['acc_no']."</option>";
+        } ?>
+        
+      </select>
+
       
 
       
